@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RoomDto } from './dtos/room.dto';
 
 @Injectable()
 export class ChatService {
@@ -14,21 +15,20 @@ export class ChatService {
       throw new NotFoundException('Some users not found');
     }
 
-    return this.prisma.room.create({
+    const newRoom = await this.prisma.room.create({
       data: {
         name,
         users: {
           connect: userIds.map((id) => ({ id })),
         },
       },
-      include: {
-        users: true,
-        messages: true,
-      },
+      // no include => only room fields are returned
     });
+
+    return newRoom;
   }
 
-  async getAllRooms() {
+  async getAllRooms(): Promise<RoomDto[]> {
     return this.prisma.room.findMany();
   }
 
@@ -79,10 +79,6 @@ export class ChatService {
         text,
         room: { connect: { id: room.id } },
         user: { connect: { id: userId } },
-      },
-      include: {
-        user: true,
-        room: true,
       },
     });
   }
