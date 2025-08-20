@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UploadModule } from './common/upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     UploadModule,
     MulterModule.register({ storage: null }),
     ScheduleModule.forRoot(),
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
