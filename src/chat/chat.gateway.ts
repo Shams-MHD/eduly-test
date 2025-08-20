@@ -31,12 +31,29 @@ export class ChatGateway
     this.logger.log(`client disconnected: ${client.id}`);
   }
 
+  @SubscribeMessage('chatToPublic')
+  async handlePublicMessage(
+    client: Socket,
+    message: { sender: string; message: string },
+  ) {
+    await this.chatService.addMessageToRoom(
+      'public',
+      Number(message.sender),
+      message.message,
+    );
+    this.wss.emit('chatToPublic', message);
+  }
+
   @SubscribeMessage('chatToServer')
-  handleMessage(
+  async handleMessage(
     client: Socket,
     message: { sender: string; room: string; message: string },
   ) {
-    console.log(message);
+    await this.chatService.addMessageToRoom(
+      message.room,
+      Number(message.sender),
+      message.message,
+    );
     this.wss.to(message.room).emit('chatToClient', message);
   }
 
